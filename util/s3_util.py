@@ -2,15 +2,17 @@ import boto3
 from botocore.exceptions import ClientError
 
 from util.logger_util import logger
-from util.const_util import AWS_S3_PREFIX, AWS_REGION_NAME
+from util.const_util import AWS_S3_PREFIX, AWS_REGION_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 
 class S3:
     def __init__(self, region_name=AWS_REGION_NAME, bucket_name='raw-data'):
         self.region_name = region_name
         self.bucket_name = self.norm_bucket_name(bucket_name)
-        self.s3_client = boto3.client('s3', region_name=region_name)
-
+        self.s3_client = boto3.client('s3',
+                                      aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                      aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                                      region_name=region_name)
         # create bucket if not exist
         if not self.check_exist_bucket():
             self.create_bucket()
@@ -22,6 +24,8 @@ class S3:
 
     def check_exist_bucket(self):
         s3 = boto3.resource('s3',
+                            aws_access_key_id=AWS_ACCESS_KEY_ID,
+                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
                             region_name=self.region_name)
         return s3.Bucket(self.bucket_name) in s3.buckets.all()
 

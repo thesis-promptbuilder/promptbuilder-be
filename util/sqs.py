@@ -1,7 +1,7 @@
 import boto3
 import json
 from util.logger_util import logger
-from util.const_util import AWS_REGION_NAME
+from util.const_util import AWS_REGION_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 
 class SQS:
@@ -9,7 +9,10 @@ class SQS:
         self.region_name = region_name
         self.queue_name = f'{queue_name}.fifo' if fifo == 'true' else queue_name
         self.fifo = fifo
-        self.sqs_client = boto3.client("sqs", region_name=self.region_name)
+        self.sqs_client = boto3.client("sqs",
+                                       aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                       aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                                       region_name=self.region_name)
         logger.info(f'SQS: {self.region_name} | {self.queue_name}')
 
     def create_queue(self):

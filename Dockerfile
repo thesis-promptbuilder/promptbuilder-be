@@ -1,4 +1,6 @@
-FROM python:3.8.9-slim
+FROM python:3.10.12-slim
+
+RUN apt-get -y update && apt-get install -y libzbar-dev
 
 WORKDIR /app
 COPY . ./
