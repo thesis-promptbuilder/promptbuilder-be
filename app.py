@@ -20,6 +20,12 @@ blueprint.add_middleware(
     allow_headers=["*"],
 )
 
+
+@blueprint.get('/')
+def health_check():
+    return {'message': 'Hello World!'}
+
+
 blueprint.include_router(user_controller, prefix="/api", tags=["User"])
 blueprint.include_router(upvote_controller, prefix="/api", tags=["Upvote"])
 blueprint.include_router(prompt_controller, prefix="/api", tags=["Prompt"])
