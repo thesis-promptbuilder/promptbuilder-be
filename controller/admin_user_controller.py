@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import BaseModel
 
-from model.user_model import User
+from model.user_model import User, UserUpdate
 from service.user_service import UserService
 from util.token_util import JWTBearer
 from util.wrap_util import wrap_get_list_response, wrap_response
@@ -28,7 +28,7 @@ def get_user(user_id: str, deep: bool = False):
 
 @api.put('/user/{user_id}', dependencies=[Depends(JWTBearer(check_admin=True))])
 @wrap_response
-def update_user(user_id: str, user: User):
+def update_user(user_id: str, user: UserUpdate):
     result, code, msg = user_service.update(user_id, user.dict())
     return result, code, msg
 

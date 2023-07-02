@@ -10,11 +10,10 @@ generate_service = GenerateService()
 
 
 class Payload(BaseModel):
-    user_id: str
     hint_text: str
 
 
-@api.post('/generate', dependencies=[Depends(JWTBearer())])
+@api.post('/generate')
 @wrap_response
 def create_prompt(payload: Payload):
     result, code, msg = generate_service.generate(payload.dict())

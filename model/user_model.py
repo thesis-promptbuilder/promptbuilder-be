@@ -27,6 +27,10 @@ class User(BaseModel):
         }
 
 
+class UserUpdate(User):
+    password: str = None
+
+
 class UserModel(BaseMongoModel):
     def __init__(self):
         super().__init__(mongodb_config['db_name'], mongodb_config['user_collection'])

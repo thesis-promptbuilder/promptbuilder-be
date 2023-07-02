@@ -10,10 +10,11 @@ class UserService(BaseService):
 
     def build_update_item(self, update_item):
         item = {}
-        item['username'] = update_item.get('username', '')
-        item['gmail'] = update_item.get('gmail', '')
-        item['password'] = update_item.get('password', '')
-        item['role'] = update_item.get('role', '')
+        item['username'] = update_item.get('username', None)
+        item['gmail'] = update_item.get('gmail', None)
+        item['password'] = update_item.get('password', None)
+        item['role'] = update_item.get('role', None)
+        item['is_ban'] = update_item.get('is_ban', None)
 
         return item, '0', 'item valid'
 
