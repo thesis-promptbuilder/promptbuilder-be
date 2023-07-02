@@ -1,8 +1,6 @@
 from model.image_model import ImageModel
-from model.upvote_model import UpvoteModel
 from service.base_service import BaseService
 from service.prompt_service import PromptService
-from service.upvote_service import UpvoteService
 from service.user_service import UserService
 from util import s3_image, sqs
 from util.time_util import get_time_string
@@ -66,28 +64,29 @@ class ImageService(BaseService):
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e
 
     def get_extra_info(self, item):
-        prompt_id = item.get('prompt_id', '')
-        user_sender_id = item.pop('user_sender_id', '')
-
-        prompt, _, _ = PromptService().get(prompt_id)
-        if not prompt:
-            return None
-        user_id = prompt['user_id']
-        user, _, _ = UserService().get(user_id)
-        if not user:
-            return None
-
-        upvote, _, _ = UpvoteService().get(None, {'user_sender_id': user_sender_id,
-                                                  'user_receiver_id': user_id,
-                                                  'prompt_id': prompt_id})
-
-        count_upvote = UpvoteModel().count({'prompt_id': prompt_id})
-
         return {**item,
-                'image_src': AWS_CDN + item['image_src'],
-                'is_upvote': bool(upvote),
-                'count_upvote': count_upvote,
-                'user_gmail': user.get('gmail', ''),
-                'prompt_id': prompt.get('id', ''),
-                'prompt': prompt.get('prompt', ''),
-                'negative_prompt': prompt.get('negative_prompt', '')}
+                'image_src': AWS_CDN + item['image_src']}
+
+    def get(self, id, _filter={}, deep=True):
+        try:
+            item, code, msg = self.model.get(id, _filter=_filter)
+            if not item:
+                return None, Error.ERROR_CODE_GOT_NO_SUCH_ITEM, Error.ERROR_MESSAGE_GOT_NO_SUCH_ITEM
+            if deep:
+                user_id = item.get('user_id', '')
+                prompt_id = item.get('prompt_id', '')
+                user, _, _ = UserService().get(user_id)
+                prompt, _, _ = PromptService().get(prompt_id)
+
+                item = {
+                    **item,
+                    'image_src': AWS_CDN + item['image_src'],
+                    'user_gmail': user.get('gmail', ''),
+                    'prompt': prompt.get('prompt', ''),
+                    'negative_prompt': prompt.get('negative_prompt', '')
+                }
+
+            return item, code, msg
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return None, Error.ERROR_CODE_GOT_EXCEPTION, e

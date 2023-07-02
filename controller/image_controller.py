@@ -48,6 +48,13 @@ def create_image(user_id: str = Form(...),
     return result, code, msg
 
 
+@api.get('/image/{image_id}')
+@wrap_response
+def get_image(image_id: str):
+    result, code, msg = image_service.get(image_id)
+    return result, code, msg
+
+
 @api.get('/image/search/semantic-search')
 @wrap_response
 def search_semantic(query: str, user_sender_id: str = None):

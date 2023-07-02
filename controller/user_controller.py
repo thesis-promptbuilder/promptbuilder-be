@@ -30,7 +30,7 @@ class UserLogin(BaseModel):
         schema_extra = {
             "example": {
                 "gmail": 'tranhuuhuy297@gmail.com',
-                "password": '4db17c4a8175908bbcbe21dec3cc008e0ff6d7817a5d9e9bff6e0d99f2b6d352',
+                "password": '',
             }
         }
 
