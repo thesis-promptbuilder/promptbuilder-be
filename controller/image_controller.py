@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from util import pinecone_user_prompt
 from PIL import Image as PILImage
 
@@ -9,7 +9,7 @@ from model.image_model import Image
 from service.image_service import ImageService
 from util.image_util import compress_image
 from util.token_util import JWTBearer
-from util.wrap_util import wrap_get_list_response, wrap_response
+from util.wrap_util import wrap_authorization, wrap_get_list_response, wrap_response
 
 api = APIRouter()
 image_service = ImageService()
@@ -30,7 +30,8 @@ def get_list_image(user_id: str = None, page: int = 0, size: int = 20):
 
 @api.delete('/image/{image_id}', dependencies=[Depends(JWTBearer())])
 @wrap_response
-def delete_image(image_id: str):
+@wrap_authorization
+def delete_image(req: Request,  image_id: str, user_id: str):
     _id, code, msg = image_service.delete(image_id)
     if _id is not None:
         pinecone_user_prompt.delete([_id])
@@ -39,10 +40,13 @@ def delete_image(image_id: str):
 
 @api.post('/image', dependencies=[Depends(JWTBearer())])
 @wrap_response
-def create_image(user_id: str = Form(...),
-                 prompt: str = Form(...),
-                 negative_prompt: str = Form(None),
-                 image: UploadFile = File(...)):
+@wrap_authorization
+def create_image(
+        req: Request,
+        user_id: str = Form(...),
+        prompt: str = Form(...),
+        negative_prompt: str = Form(None),
+        image: UploadFile = File(...)):
     result, code, msg = image_service.create({
         'user_id': user_id,
         'prompt': prompt,
