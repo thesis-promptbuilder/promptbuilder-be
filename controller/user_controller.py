@@ -42,6 +42,12 @@ def login(user: UserLogin):
     password = user.dict()['password']
     result, code, msg = user_service.get(None, {'gmail': gmail})
 
+    if result is not None:
+        if not result.get('is_activate', False):
+            return None, -2, 'not activate'
+        if result.get('is_ban', True):
+            return None, -3, 'user is banned'
+
     if result is not None and password == result['password']:
         access_token, expire_time = encode_token(result)
         return {'access_token': access_token, 'expire_time': expire_time, **result}, code, msg
@@ -65,6 +71,9 @@ def logout():
 @wrap_response
 def get_user(user_id: str):
     result, code, msg = user_service.get(user_id)
+    if result is not None:
+        result.pop('password')
+        result.pop('verify_code', '')
     return result, code, msg
 
 
