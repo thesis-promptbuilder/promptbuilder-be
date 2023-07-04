@@ -62,6 +62,24 @@ def signup(user: UserSignUp):
     return result, code, msg
 
 
+@api.post('/user/verify')
+@wrap_response
+def verify(gmail: str, verify_code: str):
+    user, code, msg = user_service.get(None, _filter={'gmail': gmail})
+
+    if user is not None:
+        _verify_code = user.pop('verify_code', None)
+        _id = user.get('id', None)
+        if str(_verify_code) == str(verify_code):
+            _, code, msg = user_service.update(_id, {'is_activate': True})
+            if code != 0:
+                return None, code, 'verify fail'
+        else:
+            return None, -1, 'wrong code'
+
+    return None, 0, 'verify success'
+
+
 @api.post('/user/logout')
 def logout():
     pass

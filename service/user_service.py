@@ -3,6 +3,10 @@ from service.base_service import BaseService
 from util.logger_util import logger
 from util.error_util import Error
 
+import random
+
+MAX_USERNAME = 20
+
 
 class UserService(BaseService):
     def __init__(self):
@@ -40,17 +44,19 @@ class UserService(BaseService):
         username = data.get('username', None)
         gmail = data.get('gmail', None)
         password = data.get('password', None)
+        verify_code = random.randint(100000, 999999)
 
         if not (username and gmail and password):
             return None, -1, 'invalid data'
 
         result, code, msg = self.model.create({
-            'username': username,
+            'username': username[:MAX_USERNAME],
             'gmail': gmail,
             'password': password,
             'role': 'user',
             'is_ban': False,
-            'is_activate': True
+            'is_activate': False,
+            'verify_code': verify_code
         })
 
         return result, code, msg
