@@ -15,6 +15,7 @@ class UserService(BaseService):
         item['password'] = update_item.get('password', None)
         item['role'] = update_item.get('role', None)
         item['is_ban'] = update_item.get('is_ban', None)
+        item['is_activate'] = update_item.get('is_activate', None)
 
         return item, '0', 'item valid'
 

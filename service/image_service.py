@@ -1,3 +1,5 @@
+import uuid
+
 from model.image_model import ImageModel
 from service.base_service import BaseService
 from service.prompt_service import PromptService
@@ -15,35 +17,36 @@ class ImageService(BaseService):
 
     def build_item(self, item):
         user_id = item.get('user_id', '')
+        prompt = item.get('prompt', None)
+        negative_prompt = item.get('negative_prompt', '')
+        if negative_prompt is None:
+            negative_prompt = ''
+        image = item.get('image', None)
+
         user, _, _ = UserService().get(user_id)
         if user is None:
             return None, -1, 'invalid user'
-
-        prompt_id = item.get('prompt_id', '')
-        prompt, _, _ = PromptService().get(prompt_id)
         if prompt is None:
-            return None, -1, 'invalid prompt'
-
-        image = item.get('image', None)
+            return None, -1, 'empty prompt'
         if image is None:
             return None, -1, 'invalid image'
 
         file_name = ''
         if type(image) is dict:
-            file_name = f'user/{user_id}/{get_time_string()}/{image["filename"]}'
+            file_name = f'user/{user_id}/{get_time_string()}/{str(uuid.uuid1())}'
             s3_image.upload_file(image["filename"], file_name)
         else:
-            file_name = f'user/{user_id}/{get_time_string()}/{image.filename}'
+            file_name = f'user/{user_id}/{get_time_string()}/{str(uuid.uuid1())}'
             s3_image.put_object(image.file, file_name)
 
         image_src = f'/{file_name}'
 
         return {
             'user_id': user_id,
-            'prompt_id': prompt_id,
+            'user_gmail': user['gmail'],
+            'prompt': prompt,
+            'negative_prompt': negative_prompt,
             'image_src': image_src,
-            'prompt': prompt.get('prompt', ''),
-            'negative_prompt': prompt.get('negative_prompt', '')
         }, 0, 'valid'
 
     def create(self, data):
@@ -51,8 +54,7 @@ class ImageService(BaseService):
             item, code, msg = self.build_item(data)
             if item is None:
                 return None, code, msg
-            prompt = item.pop('prompt')
-            negative_prompt = item.pop('negative_prompt')
+            prompt = item['prompt']
 
             logger.info(f'Build item: {msg}\n{item}')
             created_item, code, msg = self.model.create(item)
@@ -60,9 +62,7 @@ class ImageService(BaseService):
             if created_item:
                 pinecone_user_prompt.upsert([created_item['id']],
                                             [prompt],
-                                            [{**created_item,
-                                              'prompt': prompt,
-                                              'negative_prompt': negative_prompt}])
+                                            [created_item])
 
             return created_item, code, msg
         except Exception as e:
@@ -72,27 +72,3 @@ class ImageService(BaseService):
     def get_extra_info(self, item):
         return {**item,
                 'image_src': AWS_CDN + item['image_src']}
-
-    def get(self, id, _filter={}, deep=True):
-        try:
-            item, code, msg = self.model.get(id, _filter=_filter)
-            if not item:
-                return None, Error.ERROR_CODE_GOT_NO_SUCH_ITEM, Error.ERROR_MESSAGE_GOT_NO_SUCH_ITEM
-            if deep:
-                user_id = item.get('user_id', '')
-                prompt_id = item.get('prompt_id', '')
-                user, _, _ = UserService().get(user_id)
-                prompt, _, _ = PromptService().get(prompt_id)
-
-                item = {
-                    **item,
-                    'image_src': AWS_CDN + item['image_src'],
-                    'user_gmail': user.get('gmail', ''),
-                    'prompt': prompt.get('prompt', ''),
-                    'negative_prompt': prompt.get('negative_prompt', '')
-                }
-
-            return item, code, msg
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            return None, Error.ERROR_CODE_GOT_EXCEPTION, e
