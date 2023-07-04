@@ -1,11 +1,11 @@
 import re
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
 from service.prompt_service import PromptService
 from util.token_util import JWTBearer
-from util.wrap_util import wrap_get_list_response, wrap_response
+from util.wrap_util import wrap_authorization, wrap_get_list_response, wrap_response
 from util import pinecone, sqs_generate_image
 from util.const_util import PINECONE_NAMESPACE_USER
 
@@ -21,7 +21,8 @@ class Prompt(BaseModel):
 
 @api.post('/prompt', dependencies=[Depends(JWTBearer())])
 @wrap_response
-def create_prompt(prompt: Prompt, generate_image: str = False):
+@wrap_authorization
+def create_prompt(req: Request, user_id: str, prompt: Prompt, generate_image: str = False):
     if generate_image:
         sqs_generate_image.send_message({
             **prompt.dict(),
