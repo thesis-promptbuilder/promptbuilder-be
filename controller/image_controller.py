@@ -1,10 +1,10 @@
 import os
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
+from pydantic import BaseModel
 from util import pinecone_user_prompt
 from PIL import Image as PILImage
 
-
-from model.image_model import Image
+from util.logger_util import logger
 
 from service.image_service import ImageService
 from util.image_util import compress_image
@@ -75,26 +75,35 @@ def search_semantic(query: str):
     return result, 0, 'success'
 
 
+class ImageGenerate(BaseModel):
+    user_id: str
+    prompt: str
+    image_src: str
+
+
 @api.post('/upsert_after_generate')
 @wrap_response
-def upsert_after_generate(image: Image):
-    data_image = image.dict()
-    user_id = data_image.get('user_id', None)
-    prompt = data_image.get('prompt', None)
-    image_src = data_image.get('image_src', None)
+def upsert_after_generate(image: ImageGenerate):
+    data = image.dict()
+    user_id = data['user_id']
+    prompt = data['prompt']
+    image_src = data['image_src']
 
     file_name = compress_image(image_src)
     if file_name is None:
         return None, -1, 'error compress image'
 
-    result, code, msg = image_service.create({
+    data = {
         'user_id': user_id,
         'prompt': prompt,
         'image': {
             'file': PILImage.open(file_name),
             'filename': file_name
         }
-    })
+    }
+    logger.info(f'upsert after generate {data}')
+
+    result, code, msg = image_service.create(data)
 
     os.remove(file_name)
     return result, code, msg
