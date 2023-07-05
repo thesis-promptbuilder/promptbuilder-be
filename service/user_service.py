@@ -57,7 +57,7 @@ class UserService(BaseService):
                               name="PromptBuilder"),
             to=[mt.Address(email=gmail)],
             subject="PromptBuilder Verify Code",
-            text=verify_code,
+            text=str(verify_code),
         )
 
         client = mt.MailtrapClient(token=MAILTRAP_KEY)
