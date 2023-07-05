@@ -3,7 +3,10 @@ from service.base_service import BaseService
 from util.logger_util import logger
 from util.error_util import Error
 
+from util.const_util import MAILTRAP_KEY
+
 import random
+import mailtrap as mt
 
 MAX_USERNAME = 20
 
@@ -48,6 +51,17 @@ class UserService(BaseService):
 
         if not (username and gmail and password):
             return None, -1, 'invalid data'
+
+        mail = mt.Mail(
+            sender=mt.Address(email="mailtrap@promptbuilder.pro",
+                              name="PromptBuilder"),
+            to=[mt.Address(email=gmail)],
+            subject="PromptBuilder Verify Code",
+            text=verify_code,
+        )
+
+        client = mt.MailtrapClient(token=MAILTRAP_KEY)
+        client.send(mail)
 
         result, code, msg = self.model.create({
             'username': username[:MAX_USERNAME],

@@ -27,3 +27,6 @@ AWS_REGION_NAME = os.getenv('AWS_REGION_NAME')
 AWS_CDN = os.getenv('AWS_CDN')
 AWS_S3_PREFIX = os.getenv('AWS_S3_PREFIX')
 AWS_SQS_GENERATE = os.getenv('AWS_SQS_GENERATE')
+
+# mailtrap
+MAILTRAP_KEY = os.getenv('MAILTRAP_KEY')
