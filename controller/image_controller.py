@@ -45,12 +45,10 @@ def create_image(
         req: Request,
         user_id: str = Form(...),
         prompt: str = Form(...),
-        negative_prompt: str = Form(None),
         image: UploadFile = File(...)):
     result, code, msg = image_service.create({
         'user_id': user_id,
         'prompt': prompt,
-        'negative_prompt': negative_prompt,
         'image': image
     })
     return result, code, msg

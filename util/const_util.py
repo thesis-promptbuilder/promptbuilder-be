@@ -30,3 +30,6 @@ AWS_SQS_GENERATE = os.getenv('AWS_SQS_GENERATE')
 
 # mailtrap
 MAILTRAP_KEY = os.getenv('MAILTRAP_KEY')
+
+# discord
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')

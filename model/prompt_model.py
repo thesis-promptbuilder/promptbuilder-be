@@ -7,7 +7,6 @@ from util.config_util import mongodb_config
 class Prompt(BaseModel):
     user_id: str
     prompt: str
-    negative_prompt: str
 
 
 class PromptModel(BaseMongoModel):

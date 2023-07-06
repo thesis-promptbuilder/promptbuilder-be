@@ -78,7 +78,8 @@ def verify(gmail: str, verify_code: str):
         else:
             return None, -1, 'wrong code'
 
-    return None, 0, 'verify success'
+    access_token, expire_time = encode_token(user)
+    return {'access_token': access_token, 'expire_time': expire_time, **user}, code, msg
 
 
 @api.post('/user/logout')
@@ -89,11 +90,14 @@ def logout():
 @api.get('/user/{user_id}')
 @wrap_response
 def get_user(user_id: str):
-    result, code, msg = user_service.get(user_id)
-    if result is not None:
-        result.pop('password')
-        result.pop('verify_code', '')
-    return result, code, msg
+    _result, code, msg = user_service.get(user_id)
+    if _result is not None:
+        return {
+            'username': _result.get('username', ''),
+            'id': _result.get('id', '')
+        }, code, msg
+
+    return None, code, msg
 
 
 @api.put('/user/{user_id}', dependencies=[Depends(JWTBearer())])

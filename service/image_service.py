@@ -18,18 +18,11 @@ class ImageService(BaseService):
     def build_item(self, item):
         user_id = item.get('user_id', '')
         prompt = item.get('prompt', None)
-        negative_prompt = item.get('negative_prompt', '')
-        if negative_prompt is None:
-            negative_prompt = ''
         image = item.get('image', None)
 
         user, _, _ = UserService().get(user_id)
         if user is None:
             return None, -1, 'invalid user'
-        if prompt is None:
-            return None, -1, 'empty prompt'
-        if image is None:
-            return None, -1, 'invalid image'
 
         file_name = ''
         if type(image) is dict:
@@ -43,9 +36,7 @@ class ImageService(BaseService):
 
         return {
             'user_id': user_id,
-            'user_gmail': user['gmail'],
             'prompt': prompt,
-            'negative_prompt': negative_prompt,
             'image_src': image_src,
         }, 0, 'valid'
 

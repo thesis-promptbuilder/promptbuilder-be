@@ -16,7 +16,6 @@ prompt_service = PromptService()
 class Prompt(BaseModel):
     user_id: str
     prompt: str
-    negative_prompt: str = ''
 
 
 @api.post('/prompt', dependencies=[Depends(JWTBearer())])
