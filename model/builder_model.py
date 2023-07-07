@@ -2,7 +2,7 @@ import pymongo
 from pydantic import BaseModel
 
 from model.base_mongodb import BaseMongoModel
-from util.config_util import mongodb_config
+from util.const_util import MONGO_DB_NAME
 
 
 class BuilderType(BaseModel):
@@ -19,7 +19,7 @@ class BuilderValue(BaseModel):
 
 class BuilderTypeModel(BaseMongoModel):
     def __init__(self):
-        super().__init__(mongodb_config['db_name'], mongodb_config['builder_type_collection'])
+        super().__init__(MONGO_DB_NAME, 'BuilderType')
         self.collection.create_index([('parent', pymongo.ASCENDING),
                                       ('name', pymongo.ASCENDING)],
                                      name='parent_name', unique=True)
@@ -27,7 +27,7 @@ class BuilderTypeModel(BaseMongoModel):
 
 class BuilderValueModel(BaseMongoModel):
     def __init__(self):
-        super().__init__(mongodb_config['db_name'], mongodb_config['builder_value_collection'])
+        super().__init__(MONGO_DB_NAME, 'BuilderValue')
         self.collection.create_index([('parent', pymongo.ASCENDING),
                                       ('name', pymongo.ASCENDING)],
                                      name='parent_name', unique=True)

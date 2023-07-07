@@ -5,6 +5,7 @@ load_dotenv(dotenv_path='.env')
 
 # mongo
 MONGO_URL = os.getenv('MONGO_URL')
+MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
 
 # pinecone
 MODEL_NAME = os.getenv('MODEL_NAME')

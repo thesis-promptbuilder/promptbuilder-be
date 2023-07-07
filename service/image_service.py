@@ -2,7 +2,6 @@ import uuid
 
 from model.image_model import ImageModel
 from service.base_service import BaseService
-from service.prompt_service import PromptService
 from service.user_service import UserService
 from util import s3_image, pinecone_user_prompt
 from util.time_util import get_time_string

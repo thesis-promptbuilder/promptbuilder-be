@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from model.base_mongodb import BaseMongoModel
-from util.config_util import mongodb_config
+from util.const_util import MONGO_DB_NAME
 
 
 class Generate(BaseModel):
@@ -12,4 +12,4 @@ class Generate(BaseModel):
 
 class GenerateModel(BaseMongoModel):
     def __init__(self):
-        super().__init__(mongodb_config['db_name'], mongodb_config['generate_collection'])
+        super().__init__(MONGO_DB_NAME, 'Generate')

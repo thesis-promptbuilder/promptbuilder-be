@@ -1,12 +1,19 @@
+from util import mongo_client
 from util.const_util import DISCORD_TOKEN
 from util.s3_util import S3
 from util.image_util import compress_image
 import requests
 import json
 import uuid
-from util.time_util import get_time_string
+from util.time_util import get_time_string, now
+from service.image_service import ImageService
+from PIL import Image as PILImage
+
 
 s3_discord = S3(bucket_name='discord')
+image_service = ImageService()
+
+user_id = '64a7d1ca419d379db65d71eb'
 
 
 def crawl_message(url):
@@ -27,24 +34,38 @@ def crawl_channel(channel_id, before=None):
     if result is None:
         return None
 
-    s3_discord.put_object(json.dumps(result), f'{get_time_string()}/{str(uuid.uuid1())}')
+    # s3_discord.put_object(json.dumps(result), f'{get_time_string()}/{str(uuid.uuid1())}')
     _id_before = None
 
     for sen in result:
+        print(sen)
         attachments = sen.get('attachments', [])
         prompt = sen.get('content', '')
+        author = sen.get('author', None)
         _id = sen.get('id', None)
 
-        if _id is None or len(attachments) == 0:
+        if _id is None or len(attachments) == 0 or author.get('username', '') != 'Midjourney Bot':
             continue
 
         _id_before = _id
-        # image_file = compress_image(attachments[0]['url'])
+        image_file = compress_image(attachments[0]['url'])
+        data = {
+            'user_id': user_id,
+            'prompt': prompt,
+            'image': {
+                'file': PILImage.open(image_file),
+                'filename': image_file
+            }
+        }
+        _, code, msg = image_service.create(data)
+        print(f'{prompt} - {code}')
 
     return _id_before
 
 
 if __name__ == '__main__':
-    channel_id = '1008571159043903509'
-    while True:
-        _id_before = crawl_channel(channel_id)
+    channel_id = '1008571102328541215'
+
+    # while True:
+    _id_before = crawl_channel(channel_id)
+    print(_id_before)

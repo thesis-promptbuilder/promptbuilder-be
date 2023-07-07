@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from pydantic import BaseModel
 
-from service.prompt_service import PromptService
 from service.image_service import ImageService
 from service.user_service import UserService
 from service.upvote_service import UpvoteService
@@ -116,7 +115,6 @@ def update_user(
 @api.get('/user/{user_id}/statistics')
 @wrap_response
 def get_statistics(user_id: str):
-    # count_prompt = PromptService().count({'user_id': user_id})
     count_image = ImageService().count({'user_id': user_id})
     count_upvote = UpvoteService().count({'user_receiver_id': user_id})
 

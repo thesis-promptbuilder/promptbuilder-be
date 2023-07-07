@@ -1,12 +1,11 @@
 import datetime
 import threading
-from copy import deepcopy
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
 from pymongo.errors import DuplicateKeyError
 
-from util.config_util import MONGO
+from util import mongo_client
 from util.error_util import Error
 from util.logger_util import logger
 from util.time_util import now
@@ -27,7 +26,7 @@ class Singleton(type):
 
 class BaseMongoModel(object, metaclass=Singleton):
     def __init__(self, db, collection):
-        self.db = MONGO[db]
+        self.db = mongo_client[db]
         self.collection = self.db[collection]
 
     def convert_fields(self, item):
