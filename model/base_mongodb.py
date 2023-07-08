@@ -63,6 +63,23 @@ class BaseMongoModel(object, metaclass=Singleton):
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_CREATED_FAILED, e
 
+    def create_many(self, items):
+        try:
+            time = now()
+            for item in items:
+                item['create_time'] = time
+                item['update_time'] = time
+
+            return_ids = self.collection.insert_many(
+                items, ordered=False).inserted_ids
+            if return_ids:
+                return [self.convert_fields(item) for item in items], 0, 'Create items successfully'
+            else:
+                return None, Error.ERROR_CODE_CREATED_FAILED, Error.ERROR_MESSAGE_CREATED_FAILED
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return None, Error.ERROR_CODE_CREATED_FAILED, e
+
     def count(self, _filter):
         return self.collection.count_documents(_filter)
 

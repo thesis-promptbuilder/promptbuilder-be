@@ -8,7 +8,6 @@ from util.const_util import MONGO_DB_NAME
 class BuilderType(BaseModel):
     parent: str
     name: str
-    short_name: str
 
 
 class BuilderValue(BaseModel):

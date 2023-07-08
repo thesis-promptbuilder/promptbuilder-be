@@ -40,6 +40,21 @@ class BaseService(object, metaclass=Singleton):
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e
 
+    def create_many(self, items):
+        try:
+            valid_items = []
+            for data in items:
+                item, code, msg = self.build_item(data)
+                logger.debug(f'Build item: {msg}\n{item}')
+                if item:
+                    valid_items.append(item)
+
+            returned_items, code, msg = self.model.create_many(valid_items)
+            return returned_items, code, msg
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return None, Error.ERROR_CODE_GOT_EXCEPTION, e
+
     def count(self, _filter={}):
         return self.model.count(_filter)
 

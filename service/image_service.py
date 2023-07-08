@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from model.image_model import ImageModel
@@ -26,7 +27,8 @@ class ImageService(BaseService):
         file_name = ''
         if type(image) is dict:
             file_name = f'user/{user_id}/{get_time_string()}/{str(uuid.uuid1())}'
-            s3_image.upload_file(image["filename"], file_name)
+            if s3_image.upload_file(image["filename"], file_name):
+                os.remove(image["filename"])
         else:
             file_name = f'user/{user_id}/{get_time_string()}/{str(uuid.uuid1())}'
             s3_image.put_object(image.file, file_name)
@@ -55,6 +57,26 @@ class ImageService(BaseService):
                                             [created_item])
 
             return created_item, code, msg
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return None, Error.ERROR_CODE_GOT_EXCEPTION, e
+
+    def create_many(self, items):
+        try:
+            valid_items = []
+            for data in items:
+                item, code, msg = self.build_item(data)
+                logger.debug(f'Build item: {msg}\n{item}')
+                if item:
+                    valid_items.append(item)
+
+            returned_items, code, msg = self.model.create_many(valid_items)
+
+            if returned_items:
+                pinecone_user_prompt.upsert([item['id'] for item in returned_items],
+                                            [item['prompt'] for item in items],
+                                            returned_items)
+            return returned_items, code, msg
         except Exception as e:
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e

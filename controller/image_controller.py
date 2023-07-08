@@ -68,7 +68,7 @@ def search_semantic(query: str):
     user_prompt = [{**item, **item['metadata']} for item in user_prompt]
 
     # only get result which has score > 0.5
-    result = [image_service.get_extra_info({**item}) for item in user_prompt if item.get('score', 0) > 0.5]
+    result = [image_service.get_extra_info({**item}) for item in user_prompt]
 
     return result, 0, 'success'
 
@@ -103,5 +103,4 @@ def upsert_after_generate(image: ImageGenerate):
 
     result, code, msg = image_service.create(data)
 
-    os.remove(file_name)
     return result, code, msg

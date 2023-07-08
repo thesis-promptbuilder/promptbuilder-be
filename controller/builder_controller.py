@@ -13,9 +13,8 @@ builder_value_service = BuilderValueService()
 
 
 class BuilderType(BaseModel):
-    parent: Literal['Text', 'Style', 'Param']
+    parent: str
     name: str
-    short_name: str
 
 
 class BuilderValue(BaseModel):
@@ -33,8 +32,6 @@ def get_list_builder_type(page: int = 0, size: int = 100, parent: str = 'Style')
 @wrap_response
 def create_builder_type(builder_type: BuilderType):
     item = {key: value.title() for (key, value) in builder_type.dict().items()}
-    if 'short_name' in builder_type.dict():
-        item['short_name'] = builder_type.dict()['short_name']
     result, code, msg = BuilderTypeService().create(item)
     return result, code, msg
 
