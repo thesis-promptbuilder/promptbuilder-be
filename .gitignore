@@ -9,3 +9,4 @@ text.txt
 sentences.txt
 faiss.index
 .env
+image/*
