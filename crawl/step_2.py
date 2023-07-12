@@ -32,7 +32,10 @@ def clean_message(msg):
                 or not prompt \
                     or 'Image #' in prompt: 
         return None
-
+    
+    if len(prompt.split('**')) < 2:
+        return None
+    
     clean_prompt = prompt.split('**')[1]
     image_src = attachments[0]['url']
 
@@ -62,7 +65,7 @@ def import_to_mongo(collection, list_valid_messages):
 
 if __name__ == '__main__':
     collection = init_mongo()
-    
+
     count = 0
     for obj in list_objects:
         body = obj.get()['Body'].read()
