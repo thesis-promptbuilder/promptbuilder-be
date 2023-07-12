@@ -13,6 +13,12 @@ class S3:
                                       aws_access_key_id=AWS_ACCESS_KEY_ID,
                                       aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
                                       region_name=region_name)
+        
+        self.s3_resource = boto3.resource('s3',
+                            aws_access_key_id=AWS_ACCESS_KEY_ID,
+                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                            region_name=self.region_name)
+        
         # create bucket if not exist
         if not self.check_exist_bucket():
             self.create_bucket()
@@ -23,11 +29,7 @@ class S3:
         return f'{AWS_S3_PREFIX}-{bucket_name}'
 
     def check_exist_bucket(self):
-        s3 = boto3.resource('s3',
-                            aws_access_key_id=AWS_ACCESS_KEY_ID,
-                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                            region_name=self.region_name)
-        return s3.Bucket(self.bucket_name) in s3.buckets.all()
+        return self.s3_resource.Bucket(self.bucket_name) in self.s3_resource.buckets.all()
 
     def create_bucket(self):
         try:
@@ -55,3 +57,7 @@ class S3:
         except ClientError as e:
             logger.error(e)
             return False
+
+    def get_list_objects(self):
+        bucket = self.s3_resource.Bucket(self.bucket_name)
+        return bucket.objects.all()
