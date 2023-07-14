@@ -14,18 +14,16 @@ class BuilderValueService(BaseService):
         super().__init__(BuilderValueModel())
 
     def build_item(self, item):
-        parent = item.get('parent', '')
+        builder_type_id = item.get('builder_type_id', '')
         name = item.get('name', '')
-        list_parent, _, _, _ = BuilderTypeService().get_list({'name': parent}, page=0, size=1000)
-        if len(list_parent) == 0:
-            return None, -1, 'parent name not exist'
 
         image = item.pop('image', None)
         if image is None:
             return None, -1, 'invalid image'
-        s3_image.put_object(image.file, f'builder/{parent}/{name}')
+        s3_image.put_object(
+            image.file, f'builder/{builder_type_id}/{name}')
 
-        item['image_src'] = f'/builder/{parent}/{name}'
+        item['image_src'] = f'/builder/{builder_type_id}/{name}'
 
         return super().build_item(item)
 

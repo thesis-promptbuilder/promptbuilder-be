@@ -6,12 +6,11 @@ from util.const_util import MONGO_DB_NAME
 
 
 class BuilderType(BaseModel):
-    parent: str
     name: str
 
 
 class BuilderValue(BaseModel):
-    parent: str
+    builder_type: str
     name: str
     image_src: str
 
@@ -19,14 +18,12 @@ class BuilderValue(BaseModel):
 class BuilderTypeModel(BaseMongoModel):
     def __init__(self):
         super().__init__(MONGO_DB_NAME, 'BuilderType')
-        self.collection.create_index([('parent', pymongo.ASCENDING),
-                                      ('name', pymongo.ASCENDING)],
-                                     name='parent_name', unique=True)
+        self.collection.create_index('name', unique=True)
 
 
 class BuilderValueModel(BaseMongoModel):
     def __init__(self):
         super().__init__(MONGO_DB_NAME, 'BuilderValue')
-        self.collection.create_index([('parent', pymongo.ASCENDING),
+        self.collection.create_index([('builder_type_id', pymongo.ASCENDING),
                                       ('name', pymongo.ASCENDING)],
-                                     name='parent_name', unique=True)
+                                     name='builder_type_id_name', unique=True)
