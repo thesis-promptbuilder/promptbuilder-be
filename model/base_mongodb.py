@@ -136,17 +136,33 @@ class BaseMongoModel(object, metaclass=Singleton):
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_UPDATED_FAILED, e
 
-    def delete(self, id):
+    def delete(self, id=None, _filter={}):
         try:
-            _filter = {'_id': ObjectId(id)}
+            if id:
+                _filter['_id'] = ObjectId(id)
             result = self.collection.delete_one(_filter)
 
             if result:
                 return result.deleted_count, 0, 'Delete item successfully'
             return None, Error.ERROR_CODE_DELETED_FAILED, Error.ERROR_MESSAGE_DELETED_FAILED
+
         except InvalidId as invalid_id_err:
             logger.error(invalid_id_err, exc_info=True)
             return None, Error.ERROR_CODE_DELETED_FAILED, str(invalid_id_err)
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return None, Error.ERROR_CODE_DELETED_FAILED, e
+
+    def delete_many(self, ids=[], _filter={}):
+        try:
+            if len(ids):
+                _filter['_id'] = {'$in': [ObjectId(_id) for _id in ids]}
+            result = self.collection.delete_many(_filter)
+
+            if result:
+                return result.deleted_count, 0, 'Delete items successfully'
+            return None, Error.ERROR_CODE_DELETED_FAILED, Error.ERROR_MESSAGE_DELETED_FAILED
+
         except Exception as e:
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_DELETED_FAILED, e

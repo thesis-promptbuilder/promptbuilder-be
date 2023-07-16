@@ -10,3 +10,5 @@ sentences.txt
 faiss.index
 .env
 image/*
+
+crawl/*/*.json

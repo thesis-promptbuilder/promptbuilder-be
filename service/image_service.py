@@ -5,10 +5,14 @@ from model.image_model import ImageModel
 from service.base_service import BaseService
 from service.user_service import UserService
 from util import s3_image, pinecone_user_prompt
+from util.image_util import compress_image
 from util.time_util import get_time_string
 from util.logger_util import logger
 from util.error_util import Error
 from util.const_util import AWS_CDN
+from PIL import Image as PILImage
+
+from util import pinecone_user_prompt
 
 
 class ImageService(BaseService):
@@ -84,3 +88,30 @@ class ImageService(BaseService):
     def get_extra_info(self, item):
         return {**item,
                 'image_src': AWS_CDN + item['image_src']}
+
+    def upsert_after_generate(self, data):
+        user_id = data['user_id']
+        prompt = data['prompt']
+        image_src = data['image_src']
+
+        file_name = compress_image(image_src)
+        if file_name is None:
+            return None, -1, 'error compress image'
+
+        data = {
+            'user_id': user_id,
+            'prompt': prompt,
+            'image': {
+                'file': PILImage.open(file_name),
+                'filename': file_name
+            }
+        }
+        logger.info(f'upsert after generate {data}')
+
+        result, code, msg = self.create(data)
+
+        return result, code, msg
+
+    def extend_delete(self, ids):
+        pinecone_user_prompt.delete(ids)
+        return True, 0, 'success'

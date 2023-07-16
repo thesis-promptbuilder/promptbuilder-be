@@ -2,7 +2,6 @@ from model.user_model import UserModel
 from service.base_service import BaseService
 from util.logger_util import logger
 from util.error_util import Error
-
 from util.const_util import MAILTRAP_KEY
 
 import random
@@ -72,5 +71,17 @@ class UserService(BaseService):
             'is_activate': False,
             'verify_code': verify_code
         })
+
+        return result, code, msg
+
+    def extend_delete(self, ids):
+        from service.image_service import ImageService
+        image_service = ImageService()
+
+        list_image, _, _, _ = image_service.get_list(
+            {'user_id': {'$in': ids}}, size=1000000)
+
+        result, code, msg = image_service.delete_many(
+            ids=[image['id'] for image in list_image])
 
         return result, code, msg

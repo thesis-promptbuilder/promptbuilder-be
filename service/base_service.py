@@ -109,12 +109,31 @@ class BaseService(object, metaclass=Singleton):
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e
 
-    def delete(self, id):
+    def delete(self, id=None, _filter={}):
         try:
-            delete_count, code, msg = self.model.delete(id)
+            delete_count, code, msg = self.model.delete(id, _filter=_filter)
+            if id:
+                _, _, _ = self.extend_delete([id])
             if delete_count:
                 return id, code, msg
             return None, -1, 'None of item was deleted'
         except Exception as e:
             logger.error(e, exc_info=True)
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e
+
+    def delete_many(self, ids=[], _filter={}):
+        try:
+            delete_count, code, msg = self.model.delete_many(
+                ids, _filter=_filter)
+            if len(ids):
+                _, _, _ = self.extend_delete(ids)
+            if delete_count:
+                return ids, code, msg
+
+            return None, -1, 'None of item was deleted'
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return None, Error.ERROR_CODE_GOT_EXCEPTION, e
+
+    def extend_delete(self, ids):
+        return True, 0, 'success'
