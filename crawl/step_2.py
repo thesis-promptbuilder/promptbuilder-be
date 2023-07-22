@@ -39,6 +39,10 @@ def clean_message(msg):
         return None
 
     clean_prompt = prompt.split('**')[1]
+
+    if len(clean_prompt.split()) < 3:
+        return None
+
     image_src = attachments[0]['url']
 
     return {

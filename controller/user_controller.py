@@ -15,6 +15,10 @@ class UserUpdate(BaseModel):
     username: str
 
 
+class ChangePassword(BaseModel):
+    password: str
+
+
 class UserSignUp(BaseModel):
     username: str
     gmail: str
@@ -110,6 +114,19 @@ def update_user(
 ):
     update_item = user.dict()
     result, code, msg = user_service.update_user(user_id, update_item)
+    return result, code, msg
+
+
+@api.put('/change-password/user/{user_id}', dependencies=[Depends(JWTBearer())])
+@wrap_response
+@wrap_authorization
+def change_password(
+    req: Request,
+    user_id: str,
+    change_password: ChangePassword,
+):
+    result, code, msg = user_service.update(
+        user_id, change_password.dict())
     return result, code, msg
 
 

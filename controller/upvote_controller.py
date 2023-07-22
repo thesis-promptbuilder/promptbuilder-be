@@ -13,8 +13,13 @@ upvote_service = UpvoteService()
 
 @api.get('/upvote')
 @wrap_get_list_response
-def get_list_upvote(image_id: str):
-    result, count, code, msg = upvote_service.get_list({'image_id': image_id})
+def get_list_upvote(image_id: str = None, user_receiver_id: str = None, deep: bool = False):
+    _filter = {}
+    if image_id is not None:
+        _filter['image_id'] = image_id
+    if user_receiver_id is not None:
+        _filter['user_receiver_id'] = user_receiver_id
+    result, count, code, msg = upvote_service.get_list(_filter, deep=deep)
     return result, count, code, msg
 
 

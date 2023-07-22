@@ -12,3 +12,5 @@ faiss.index
 image/*
 
 crawl/*/*.json
+
+.DS_Store

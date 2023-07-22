@@ -114,4 +114,8 @@ class ImageService(BaseService):
 
     def extend_delete(self, ids):
         pinecone_user_prompt.delete(ids)
+        from service.upvote_service import UpvoteService
+
+        for image_id in ids:
+            UpvoteService().delete_many(_filter={'image_id': image_id})
         return True, 0, 'success'
