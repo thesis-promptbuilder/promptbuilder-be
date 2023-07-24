@@ -29,11 +29,24 @@ class Pinecone:
 
         return num_upsert
 
-    def query(self, query, top_k=200, namespace=None):
-        embed = model.encode(query).tolist()
-        result = self.index.query(
-            embed, top_k=top_k, include_metadata=True, namespace=namespace or self.namespace)
-        return result.to_dict()['matches']
+    def query(self, _id=None, query=None, top_k=200, namespace=None):
+        if _id is not None:
+            result = self.index.query(id=_id,
+                                      top_k=top_k,
+                                      include_metadata=True,
+                                      namespace=namespace or self.namespace)
+
+            return result.to_dict()['matches']
+
+        if query is not None:
+            embed = model.encode(query).tolist()
+            result = self.index.query(
+                vector=embed,
+                top_k=top_k,
+                include_metadata=True,
+                namespace=namespace or self.namespace)
+
+            return result.to_dict()['matches']
 
     def delete(self, list_id=[], delete_all=False, namespace=None):
         logger.info(f'delete {list_id} {delete_all}')

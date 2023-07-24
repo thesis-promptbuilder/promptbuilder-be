@@ -15,10 +15,12 @@ MAX_IMAGE = 1
 
 @api.get('/image')
 @wrap_get_list_response
-def get_list_image(user_id: str = None, page: int = 0, size: int = 20):
+def get_list_image(query: str = None, user_id: str = None, page: int = 0, size: int = 20):
     _filter = {}
     if user_id != None:
         _filter['user_id'] = user_id
+    if query != None:
+        _filter['prompt'] = {'$regex': f'^{query}$', '$options': 'i'}
     result, count, code, msg = image_service.get_list(
         _filter, page, size, deep=False)
     result = [image_service.get_extra_info({**item}) for item in result]
@@ -59,7 +61,7 @@ def get_image(image_id: str):
 @api.get('/image/search/semantic-search')
 @wrap_response
 def search_semantic(query: str):
-    user_prompt = pinecone_user_prompt.query(query=query)
+    user_prompt = pinecone_user_prompt.query(query=query, top_k=200)
     user_prompt = [{**item, **item['metadata']} for item in user_prompt]
 
     # only get result which has score > 0.5

@@ -40,7 +40,7 @@ def clean_message(msg):
 
     clean_prompt = prompt.split('**')[1]
 
-    if len(clean_prompt.split()) < 3:
+    if len(clean_prompt.split()) < 2:
         return None
 
     image_src = attachments[0]['url']

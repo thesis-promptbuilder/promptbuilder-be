@@ -56,9 +56,12 @@ class ImageService(BaseService):
             created_item, code, msg = self.model.create(item)
             # insert to pinecone
             if created_item:
-                pinecone_user_prompt.upsert([created_item['id']],
-                                            [prompt],
-                                            [created_item])
+                _, count, _, _ = self.get_list(
+                    _filter={'prompt': {'$regex': f'^{prompt}$', '$options': 'i'}})
+                if count == 1:  # only add to pinecone when prompt unique
+                    pinecone_user_prompt.upsert([created_item['id']],
+                                                [prompt],
+                                                [created_item])
 
             return created_item, code, msg
         except Exception as e:
