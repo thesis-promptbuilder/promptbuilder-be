@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 def now():
-    return datetime.now()
+    return datetime.utcnow()
 
 
 def get_time_string():

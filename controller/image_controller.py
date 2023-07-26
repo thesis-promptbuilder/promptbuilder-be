@@ -61,11 +61,12 @@ def get_image(image_id: str):
 @api.get('/image/search/semantic-search')
 @wrap_response
 def search_semantic(query: str):
-    user_prompt = pinecone_user_prompt.query(query=query, top_k=200)
+    user_prompt = pinecone_user_prompt.query(query=query, top_k=100)
     user_prompt = [{**item, **item['metadata']} for item in user_prompt]
 
     # only get result which has score > 0.5
-    result = [image_service.get_extra_info({**item}) for item in user_prompt]
+    result = [image_service.get_extra_info(
+        {**item}) for item in user_prompt]
 
     return result, 0, 'success'
 
@@ -80,4 +81,11 @@ class ImageGenerate(BaseModel):
 @wrap_response
 def upsert_after_generate(image: ImageGenerate):
     result, code, msg = image_service.upsert_after_generate(image.dict())
+    return result, code, msg
+
+
+@api.post('/upload')
+@wrap_response
+def upload_image(image: UploadFile = File(...)):
+    result, code, msg = image_service.upload(image)
     return result, code, msg

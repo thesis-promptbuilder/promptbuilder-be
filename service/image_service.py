@@ -89,8 +89,11 @@ class ImageService(BaseService):
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e
 
     def get_extra_info(self, item):
+        temp, _, _ = self.get(item['id'])
         return {**item,
-                'image_src': AWS_CDN + item['image_src']}
+                'image_src': AWS_CDN + item['image_src'],
+                'create_time': temp['create_time'],
+                'update_time': temp['update_time']}
 
     def upsert_after_generate(self, data):
         user_id = data['user_id']
@@ -122,3 +125,11 @@ class ImageService(BaseService):
         for image_id in ids:
             UpvoteService().delete_many(_filter={'image_id': image_id})
         return True, 0, 'success'
+
+    def upload(self, image):
+        file_name = f'upload/{get_time_string()}/{str(uuid.uuid1())}'
+        s3_image.put_object(image.file, file_name)
+
+        image_src = f'/{file_name}'
+
+        return {'image_src': AWS_CDN + image_src}, 0, 'success'

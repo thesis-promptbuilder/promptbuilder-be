@@ -13,3 +13,4 @@ class Image(BaseModel):
 class ImageModel(BaseMongoModel):
     def __init__(self):
         super().__init__(MONGO_DB_NAME, 'Image')
+        self.collection.create_index([('prompt', 'text')])

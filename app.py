@@ -30,4 +30,5 @@ blueprint.include_router(upvote_controller, prefix="/api", tags=["Upvote"])
 blueprint.include_router(image_controller, prefix="/api", tags=["Image"])
 blueprint.include_router(builder_controller, prefix="/api", tags=["Builder"])
 blueprint.include_router(generate_controller, prefix="/api", tags=["Generate"])
-blueprint.include_router(admin_user_controller, prefix="/api/admin", tags=["Admin User"])
+blueprint.include_router(admin_user_controller,
+                         prefix="/api/admin", tags=["Admin User"])
