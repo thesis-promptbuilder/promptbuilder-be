@@ -61,12 +61,12 @@ def get_image(image_id: str):
 @api.get('/image/search/semantic-search')
 @wrap_response
 def search_semantic(query: str):
-    user_prompt = pinecone_user_prompt.query(query=query, top_k=100)
-    user_prompt = [{**item, **item['metadata']} for item in user_prompt]
+    user_prompt = pinecone_user_prompt.query(query=query, top_k=300)
+    result = [{**item, **item['metadata']} for item in user_prompt]
 
-    # only get result which has score > 0.5
+    # # only get result which has score > 0.5
     result = [image_service.get_extra_info(
-        {**item}) for item in user_prompt]
+        {**item}) for item in result]
 
     return result, 0, 'success'
 

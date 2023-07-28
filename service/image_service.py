@@ -89,11 +89,8 @@ class ImageService(BaseService):
             return None, Error.ERROR_CODE_GOT_EXCEPTION, e
 
     def get_extra_info(self, item):
-        temp, _, _ = self.get(item['id'])
         return {**item,
-                'image_src': AWS_CDN + item['image_src'],
-                'create_time': temp['create_time'],
-                'update_time': temp['update_time']}
+                'image_src': AWS_CDN + item['image_src']}
 
     def upsert_after_generate(self, data):
         user_id = data['user_id']
