@@ -1,7 +1,9 @@
 import os
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from pydantic import BaseModel
-from util import pinecone_user_prompt
+from util import pinecone_user_prompt, sqs_generate_image
+
+from pydantic import BaseModel
 
 from service.image_service import ImageService
 from util.token_util import JWTBearer
@@ -89,3 +91,22 @@ def upsert_after_generate(image: ImageGenerate):
 def upload_image(image: UploadFile = File(...)):
     result, code, msg = image_service.upload(image)
     return result, code, msg
+
+
+class Image(BaseModel):
+    user_id: str
+    prompt: str
+
+
+@api.post('/generate')
+@wrap_response
+def generate(image: Image):
+    response = sqs_generate_image.send_message({
+        'action': 'generate',
+        **image.dict()
+    })
+
+    if response is None:
+        return None, -1, 'fail'
+
+    return {}, 0, 'success'

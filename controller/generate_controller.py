@@ -13,7 +13,7 @@ class Payload(BaseModel):
     hint_text: str
 
 
-@api.post('/generate')
+@api.post('/prompt-generate')
 @wrap_response
 def create_prompt(payload: Payload):
     result, code, msg = generate_service.generate(payload.dict())
