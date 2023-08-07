@@ -2,7 +2,8 @@ from util.const_util import OPENAI_API_KEY
 from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
-llm = OpenAI(model_name='gpt-3.5-turbo', openai_api_key=OPENAI_API_KEY, temperature=0.5)
+llm = OpenAI(model_name='gpt-3.5-turbo',
+             openai_api_key=OPENAI_API_KEY, temperature=0.5)
 
 prompt = PromptTemplate.from_template(
     "you are an artist, a writer, a photographer. \
